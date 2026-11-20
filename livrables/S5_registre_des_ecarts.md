@@ -1,0 +1,46 @@
+# Registre des écarts · maquette (S4) → application (S5)
+
+**Observatoire européen des marchés publics** · Ingryd Lo Tierzo Silva et Sara Lhasseni · 20 novembre 2026
+
+**Écarts imposés par l'outil.** (1) Power BI est abandonné : la publication sans authentification supposait une licence et une autorisation que nous n'avions pas. L'application est une page HTML publiée par GitHub Pages, qui calcule dans le navigateur (E1). (2) La vue 4 affiche les lignes par pages de 25, et non en liste continue, pour rester fluide sur 149 811 lignes (E12).
+
+**Écarts sur les données.** Les effectifs s'expliquent ensemble : 336 doublons = 334 dans le principal (150 147 → 149 813) + 2 dans les rares (6 024 → 6 022) (E5). Nous retirons en plus deux copies de l'ID_AW 164662498 (une ligne = une attribution) et traitons la valeur 999 comme la sentinelle 940 (E3, E4). Les taux de contrôle ne bougent pas (27,7 % ; 53,7 %), seuls les effectifs changent de quelques unités. Les deux fichiers ne sont jamais empilés (erreur n° 11) (E6).
+
+**Écarts d'analyse, issus du retour sur le rendu 4.** Le prototype affichait des valeurs écrites en dur : tout est désormais recalculé à partir des lignes, y compris les strates de la vue 2 (E2, E17). Le KPI 4 devient l'« écart ajusté du 6-10 lots », estimé par pays avec son intervalle et jamais affiché sous un filtre où il n'a pas été estimé : France +8,8 points [+1,1 ; +16,5], effet moyen non établi (E13). R3 passe de « causale plausible » à « association ajustée, hétérogène » (E18). L'indice d'anomalie devient un résidu de régression sur cinq caractéristiques : 566 attributions à z > 3 portant 28,8 % du montant, contre 489 et 36,4 % avec l'ancienne strate (E7). Une seule liste d'audit de taille N réglable (E8) ; le test du dernier centile montre que la part du Royaume-Uni tombe de 42,3 % à 11,0 % (E11). NOC perd son statut définitionnel et reste exclue par précaution (E19, E21) ; seul le KPI 4 est qualifié d'indicateur avancé (E14).
+
+**Écarts nés de la recette.** Un filtre de statut est ajouté en vue 3 (story 2, filtre manquant) et le prix à payer en offre unique est affiché sur la carte du KPI 4 (story 5, mesure absente de la vue du décideur) (E25, E26).
+
+---
+
+## Annexe · détail des 26 écarts
+
+Légende : **[imposé par l'outil]** · **[données]** · **[analyse]** · **[conception]** choix de construction · **[navigation]** · **[recette]** correction issue de la recette.
+
+| # | Écart | Pourquoi | Effet chiffré |
+|---|---|---|---|
+| E1 | **[imposé par l'outil]** Power BI abandonné ; application HTML publiée par GitHub Pages | Publication sans authentification impossible sans licence ni autorisation (retour du rendu 4, priorité 1) | — |
+| E2 | **[conception]** Le prototype affichait des valeurs écrites en dur ; l'application recalcule chaque indicateur à partir des 149 811 lignes à chaque filtre | Consigne : « un indicateur se recalcule à chaque filtre » | Recalcul < 50 ms |
+| E3 | **[données]** ID_AW 164662498 présent 3 fois (seul le poids du prix diffère : 60, 50, 40) : une seule ligne gardée | Grain : une ligne = une attribution | 149 813 → 149 811 lignes ; KPI 3 : 11 504 / 21 421 → 11 502 / 21 419 (53,7 % inchangé) ; médiane des montants 45 781 → 45 780 € |
+| E4 | **[données]** NUMBER_OFFERS = 999 (3 lignes, BG 2014, même acheteur, 45 lots) mis à vide comme 940 | Valeur sentinelle probable, répond au retour du rendu 4 | KPI 1 : 32 573 / 117 473 → 32 573 / 117 468 (27,7 % inchangé ; −3 pour 999, −2 pour E3) |
+| E5 | **[données]** Les effectifs s'expliquent ensemble : 336 doublons = 334 (principal, 150 147 → 149 813) + 2 (rares, 6 024 → 6 022) | Incohérence relevée par l'évaluateur (149 811 attendu s'il n'y avait qu'un fichier) | — |
+| E6 | **[analyse]** Le journal du fichier rares de la S3 écrit « toujours combiner P et R » : règle abandonnée, les deux fichiers ne sont jamais empilés | Erreur sanctionnée n° 11 (et non n° 15) | — |
+| E7 | **[analyse]** Indice d'anomalie (KPI 6) : la strate CPV × contrat devient un résidu de régression du log10 du montant sur secteur × contrat, pays, année, classe de lots et procédure (z robuste) | Retour du rendu 4, priorité 2 : l'ancien indice repérait surtout les plus gros contrats | z > 3 : 489 attributions (36,4 % du montant) → 566 (28,8 %) ; R² = 0,39 |
+| E8 | **[analyse]** Une seule liste d'audit : les N attributions au z le plus élevé, N réglable (100, 500, 1 000, 5 %) ; z > 3 devient un simple signal | La story 8 mélangeait 489 marchés et l'audit de 5 % (7 460) | N = 500 : 27,6 % du montant pondéré couvert |
+| E9 | **[analyse]** Axe A : NOC et AWP signalées et exclues du classement (pas de mise en concurrence publiée) ; segments sous 100 marchés jamais en tête | Consigne, vue segmentation | — |
+| E10 | **[analyse]** Axe B : enjeu = montant pondéré des marchés non allotis 2016-2017 ; taux de renseignement affiché par segment | Consigne, vue segmentation | 4 pays sous 40 % (ES, IT, AT, NO), dont 3 renseignés à moins de 50 % |
+| E11 | **[analyse]** Test du dernier centile intégré à l'axe C (demandé avant la story 12) | Retour du rendu 4 | Royaume-Uni : 42,3 % du montant pondéré, 11,0 % sans le dernier centile |
+| E12 | **[imposé par l'outil]** Vue 4 : tableau paginé (25 lignes) au lieu d'une liste continue | Fluidité sur 149 811 lignes | — |
+| E13 | **[analyse]** KPI 4 renommé « écart ajusté du 6-10 lots » (ex « gain simulé ») ; estimé par pays (logistique, contrôle montant, contrat, année), publié seulement si ≥ 100 marchés dans chaque groupe ; non affiché sous filtre contrat ou secteur | Retour du rendu 4, priorité 1 : rapport figé sous filtre = précision fausse ; DE et UK sans intervalle | France +8,8 pts [+1,1 ; +16,5] (au lieu de +5,4 [+1,5 ; +9,2], qui appliquait un rapport tous pays) ; DE −4,2 [−23,1 ; +14,8] ; UK −11,3 [−28,9 ; +6,3] ; effet moyen +3,2 [−1,7 ; +8,2], non établi |
+| E14 | **[analyse]** Vue 1 : la médiane des offres (KPI 2) et l'indice d'anomalie (KPI 6) ne sont plus présentés comme prospectifs ; seul le KPI 4 est qualifié d'indicateur avancé (levier) | Retour du rendu 4 (« prospectif » mal employé) | — |
+| E15 | **[analyse]** KPI 6 affiché en vue 1 comme la part du montant pondéré portée par les attributions à z > 3 ; KPI 5 accompagné de la part portée par le 1 % des plus gros montants | Rendre la queue visible avant tout audit | 28,8 % (566 attributions) ; 69 % du montant porté par 1 % des montants |
+| E16 | **[conception]** Filtres de contexte limités à quatre (pays, année, contrat, secteur), chacun relié à une user story affichée à l'écran | Consigne : un filtre sans user story est retiré | — |
+| E17 | **[conception]** Vue 2 : les deux groupes, les strates, les rapports de cotes (Woolf) et l'ajustement de Mantel-Haenszel (IC de Robins-Breslow-Greenland) sont recalculés à partir des lignes à chaque filtre, au lieu des valeurs fixes de la note | Consigne : relation stratifiée, effectifs des deux groupes, recalcul | R1, R2, R3 retrouvent les valeurs de la note (0,62 ; 1,46 ; 1,30) |
+| E18 | **[analyse]** R3 : statut « causal plausible » remplacé par « association ajustée, hétérogène » ; Allemagne et Royaume-Uni affichés avec leur intervalle | Retour du rendu 4 | DE 0,60 [0,38 ; 0,94] ; UK 0,50 [0,31 ; 0,80] |
+| E19 | **[analyse]** R1 et R2 : périmètre au choix, procédure ouverte (par défaut, cohérent avec le KPI 1) ou toutes procédures (reproduit la note, NOC comprise) | NOC exclue par précaution | R1 : 0,62 (toutes) contre 0,64 (ouverte) ; en procédure ouverte, l'association devient hétérogène entre pays |
+| E20 | **[analyse]** R4 : d de Cohen recalculé sur log10 du montant (écart-type commun) ; strates légèrement différentes de la note | Méthode explicitée à l'écran | Fournitures 0,30 (note : 0,35), services 0,41 (0,40), travaux −0,12 (−0,13) |
+| E21 | **[analyse]** La relation « NOP, NOC → offre unique » (définitionnelle) n'est plus dans le sélecteur : NOP est lue dans les procédures rares, NOC n'a plus de statut définitionnel | Retour du rendu 4 : statut de NOC non établi | — |
+| E22 | **[analyse]** Vue 4 : fiche d'attribution avec le montant attendu au regard de ses caractéristiques (modèle d'anomalie) et la médiane de sa strate pays × secteur × contrat recalculée sur les lignes | Story 9 : trancher entre faux positif et dossier à auditer | Cas le plus atypique : ID_AW 115005289, 354,7 M€ pour 4 126 € attendus (z = 5,74), 5,22 Md€ une fois pondéré |
+| E23 | **[navigation]** Procédures rares déplacées de l'onglet Mesures vers la vue 4 (bouton Fichier), toujours sans ligne de total ; recherche par ID_AW ou code CPV ajoutée | Maquette S4 : rares lues en vue 4 ; besoin de l'auditeur | — |
+| E24 | **[navigation]** Liens directs de la vue 1 vers la vue 4 (marchés à offre unique, attributions atypiques) en plus des liens vers les vues 2 et 3 | Consigne : drill-down depuis les trois autres vues | — |
+| E25 | **[recette]** Recette, story 2 : filtre « Afficher » par statut ajouté en vue 3, axe A | Échec diagnostiqué : filtre manquant, 19 des 26 segments en surveillance visibles | 26 segments affichés |
+| E26 | **[recette]** Recette, story 5 : prix à payer (R2) recalculé et affiché sur la carte du KPI 4 en vue 1 | Échec diagnostiqué : mesure absente de la vue du décideur | +10,4 points tous pays ; +3,5 points en France (procédure ouverte) |

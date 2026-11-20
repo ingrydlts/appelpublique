@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observatoire des marchés publics</title>
+<style>
+:root{--bg:#F8FAFE;--card:#FFFFFF;--ink:#14213D;--muted:#4A5466;--line:#DDE1E7;--accent:#1F4FD1;--accent-soft:#E6ECFC;--warn:#B34700;--warn-soft:#FFE8D6;--grey:#8A93A3;--ok:#1E7A4C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1522;--card:#182033;--ink:#E8ECF4;--muted:#A9B2C3;--line:#2B3550;--accent:#7A9BFF;--accent-soft:#22305A;--warn:#FF9A5C;--warn-soft:#4A2A14;--grey:#7D879A;--ok:#5CC98E}}
+:root[data-theme="dark"]{--bg:#0F1522;--card:#182033;--ink:#E8ECF4;--muted:#A9B2C3;--line:#2B3550;--accent:#7A9BFF;--accent-soft:#22305A;--warn:#FF9A5C;--warn-soft:#4A2A14;--grey:#7D879A;--ok:#5CC98E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header,main,footer{max-width:1180px;margin:0 auto;padding:0 16px}
+header{padding-top:16px}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:18px;margin:26px 0 4px}h3{font-size:15px;margin:18px 0 6px}
+.sub,.status{color:var(--muted);margin:0;font-size:13px}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:12px 0 0}
+nav.tabs button{background:none;border:none;border-bottom:3px solid transparent;border-radius:0;padding:10px 14px;display:flex;flex-direction:column;align-items:flex-start;min-height:52px;white-space:nowrap}
+nav.tabs button small{color:var(--muted);font-size:12px}
+nav.tabs button[aria-selected="true"]{border-bottom-color:var(--accent);font-weight:600}
+.filters{display:flex;flex-wrap:wrap;gap:12px;align-items:end;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.filters label{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:4px}
+select,button,input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-height:36px}
+select{max-width:260px}
+button{cursor:pointer}
+button.link{border:none;background:none;color:var(--accent);padding:0;min-height:0;text-decoration:underline;font-size:13px}
+.chips{display:inline-flex;gap:4px;flex-wrap:wrap}
+.chip{border-radius:999px;padding:4px 12px;min-height:32px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.axe{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.card .t{font-weight:600;margin:2px 0 6px}
+.big{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.big.low{color:var(--grey);font-size:17px}
+.n{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rule{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);margin-top:8px;padding-top:6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:10px}
+.decision{border-left:4px solid var(--accent);background:var(--accent-soft);padding:8px 12px;border-radius:6px;font-size:14px;margin:8px 0}
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:8px 0}
+.controls .lbl{font-size:12px;color:var(--muted);margin-right:6px}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.kpi{flex:1 1 180px;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted)}
+.scroll{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+th.sort{cursor:pointer;user-select:none}th.sort:hover{color:var(--ink)}
+td.num,th.num{text-align:right}
+tr.low td{color:var(--grey)}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--accent-soft)}
+.bar{position:relative;height:8px;background:var(--line);border-radius:4px;min-width:80px;margin-top:4px}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;background:var(--line);color:var(--ink);white-space:nowrap}
+.tag.act{background:var(--warn);color:#fff}.tag.watch{background:var(--warn-soft);color:var(--ink)}.tag.info{background:var(--accent-soft);color:var(--ink)}
+.hint{font-size:12px;color:var(--muted)}
+.hidden{display:none}
+footer{padding:24px 16px 32px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Observatoire européen des marchés publics</h1>
+  <p class="sub">Préparer l'exercice de surveillance 2018 : décider où agir. Chaque indicateur est recalculé à partir des lignes à chaque filtre, avec son effectif.</p>
+  <p class="status" id="status">Chargement des données…</p>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+</header>
+<main>
+  <div class="filters" aria-label="Filtres de contexte">
+    <label>Pays<select id="f-pays"><option value="">Tous</option></select></label>
+    <label>Année<select id="f-annee"><option value="">2009-2017</option></select></label>
+    <label>Type de contrat<select id="f-contrat"><option value="">Tous</option><option value="W">Travaux</option><option value="U">Fournitures</option><option value="S">Services</option></select></label>
+    <label>Secteur (division CPV)<select id="f-sect"><option value="">Tous</option></select></label>
+    <button id="reset" type="button">Réinitialiser</button>
+  </div>
+  <p class="hint" style="margin:6px 0 0">Chaque filtre sert une user story : Pays (US 4, 12) · Année (US 1 : instruire sur les années récentes) · Type de contrat (US 8 : lire la liste d'audit par contrat) · Secteur (US 1).</p>
+  <p class="status" id="perim" style="margin-top:2px"></p>
+
+  <!-- ===== Vue 1 ===== -->
+  <section id="v1" class="view">
+    <h2>Vue 1 · Où en sommes-nous ?</h2>
+    <div class="decision">Pour le décideur politique, en deux minutes : six indicateurs, deux par axe (l'état, puis le levier ou le ciblage), chacun avec son effectif. Décision : choisir l'axe à porter à l'arbitrage.</div>
+    <p class="status" id="v1-perim"></p>
+    <div class="grid" id="kpis" style="margin-top:10px"></div>
+  </section>
+
+  <!-- ===== Vue 2 ===== -->
+  <section id="v2" class="view hidden">
+    <h2>Vue 2 · Pourquoi ?</h2>
+    <p class="status">Pour l'analyste de l'Observatoire. Une relation à la fois : deux groupes avec leurs effectifs, puis la même comparaison à l'intérieur de chaque strate d'un confondant. Le statut de la relation fixe ce qu'on a le droit d'en dire. Tout est recalculé à partir des lignes, filtres compris.</p>
+    <div class="chips" style="margin-top:10px" id="r-chips"></div>
+    <div class="panel">
+      <div class="axe" id="r-axe"></div>
+      <h3 id="r-name" style="margin:2px 0 4px"></h3>
+      <div class="decision" id="r-status"></div>
+      <div class="controls">
+        <span id="r-scope-w"><span class="lbl">Périmètre</span><span class="chips" id="r-scope"></span></span>
+        <span><span class="lbl">Stratifier par</span><span class="chips" id="r-strat"></span></span>
+      </div>
+      <p class="hint" id="r-pop"></p>
+      <div class="kpis" id="r-groups"></div>
+      <p id="r-read" style="font-size:14px"></p>
+      <div class="scroll"><table><thead id="r-head"></thead><tbody id="r-body"></tbody></table></div>
+      <p class="hint" id="r-foot"></p>
+    </div>
+  </section>
+
+  <!-- ===== Vue 3 ===== -->
+  <section id="v3" class="view hidden">
+    <h2>Vue 3 · Où agir ?</h2>
+    <p class="status">Pour le responsable de la surveillance. Un mode de priorisation par axe, toujours par valeur en jeu, jamais par taux brut. Cliquer sur une ligne descend aux attributions (vue 4).</p>
+    <div class="chips" style="margin-top:10px" id="axe-chips"></div>
+
+    <!-- Axe A -->
+    <div id="ax-A" class="panel">
+      <div class="axe">Axe A · Concurrence</div>
+      <div class="decision">Sur quels segments déclencher une revue pour maximiser la dépense replacée en concurrence effective, avec notre capacité d'instruction ?</div>
+      <div class="controls">
+        <span><span class="lbl">Croisement</span><span class="chips" id="a-cross"></span></span>
+        <span><span class="lbl">Seuil d'alerte (offre unique)</span><span class="chips" id="a-seuil"></span></span>
+        <span><span class="lbl">Afficher</span><span class="chips" id="a-show"></span></span>
+        <label><span class="lbl">Capacité d'instruction N</span><input type="range" id="a-cap" min="1" max="60" value="20" style="vertical-align:middle"> <b id="a-cap-v">20</b> dossiers</label>
+      </div>
+      <div class="kpis" id="a-kpis"></div>
+      <p class="hint" id="a-note"></p>
+      <div class="scroll"><table><thead id="a-head"></thead><tbody id="a-body"></tbody></table></div>
+      <p class="hint" id="a-foot"></p>
+    </div>
+
+    <!-- Axe B -->
+    <div id="ax-B" class="panel hidden">
+      <div class="axe">Axe B · Accès des PME</div>
+      <div class="decision">Où recommander une revue d'allotissement : là où l'allotissement est le plus faible et l'enjeu PME le plus fort ?</div>
+      <div class="controls">
+        <span><span class="lbl">Segment</span><span class="chips" id="b-cross"></span></span>
+        <span class="tag info">Fenêtre 2016-2017 verrouillée : la variable PME n'existe pas avant 2016</span>
+      </div>
+      <div class="kpis" id="b-kpis"></div>
+      <div class="scroll"><table><thead id="b-head"></thead><tbody id="b-body"></tbody></table></div>
+      <p class="hint" id="b-foot"></p>
+    </div>
+
+    <!-- Axe C -->
+    <div id="ax-C" class="panel hidden">
+      <div class="axe">Axe C · Efficience budgétaire</div>
+      <div class="decision">Où concentrer l'audit : sur quels segments les montants s'écartent-ils de ce qu'annoncent leurs caractéristiques ?</div>
+      <p class="hint">Indice d'anomalie : écart du montant (log10) à celui prédit par le secteur × contrat, le pays, l'année, la classe de lots et la procédure (résidu de régression, z robuste). Atypique ne veut pas dire irrégulier. Grain : une ligne = une attribution ; un marché alloti compte une attribution par lot.</p>
+      <div class="controls">
+        <span><span class="lbl">Segment</span><span class="chips" id="c-cross"></span></span>
+        <span><span class="lbl">Capacité d'audit N</span><span class="chips" id="c-cap"></span></span>
+      </div>
+      <div class="kpis" id="c-kpis"></div>
+      <h3>Liste d'audit : qui y pèse ? (part des pays)</h3>
+      <div class="scroll"><table><thead id="c2-head"></thead><tbody id="c2-body"></tbody></table></div>
+      <p class="hint" id="c2-foot"></p>
+      <h3>Segments classés par montant atypique</h3>
+      <div class="scroll"><table><thead id="c-head"></thead><tbody id="c-body"></tbody></table></div>
+      <p class="hint" id="c-foot"></p>
+    </div>
+  </section>
+
+  <!-- ===== Vue 4 ===== -->
+  <section id="v4" class="view hidden">
+    <h2>Vue 4 · Quel cas précis ?</h2>
+    <p class="status">Pour l'analyste et l'auditeur. Une ligne = une attribution. On vérifie un cas avant d'agir : retenir ou écarter un dossier.</p>
+    <div class="controls">
+      <span><span class="lbl">Fichier</span><span class="chips" id="x-file"></span></span>
+      <form id="x-search" style="display:flex;gap:6px;align-items:center"><label class="lbl" for="x-q">Rechercher un ID_AW ou un code CPV</label><input id="x-q" name="q" inputmode="numeric" placeholder="ex. 115005289" style="width:170px"><button type="submit">Chercher</button></form>
+      <button class="link" id="x-back" type="button">← Retour à l'écran précédent</button>
+    </div>
+    <div id="x-fiche" class="panel hidden"></div>
+    <div id="x-main" class="panel">
+      <div id="x-sel" class="decision"></div>
+      <div class="controls"><span><span class="lbl">Trier par</span><span class="chips" id="x-sort"></span></span><button class="link hidden" id="x-clear" type="button">Effacer la sélection</button></div>
+      <p class="hint" id="x-stats"></p>
+      <div class="scroll"><table><thead id="x-head"></thead><tbody id="x-body"></tbody></table></div>
+      <div class="controls"><button id="x-prev" type="button">← Précédent</button><span class="hint" id="x-page"></span><button id="x-next" type="button">Suivant →</button></div>
+    </div>
+    <div id="x-rares" class="panel hidden">
+      <div class="decision">Procédures rares : fichier séparé, lu procédure par procédure, jamais additionné au fichier principal (erreur sanctionnée n° 11). Filtres pays, année et contrat appliqués.</div>
+      <div class="scroll"><table><thead><tr><th>Procédure</th><th class="num">Attributions</th><th class="num">Offre unique</th><th class="num">Numérateur / dénominateur</th><th class="num">Médiane des offres</th></tr></thead><tbody id="rares"></tbody></table></div>
+      <div class="controls"><span><span class="lbl">Procédure</span><span class="chips" id="xr-proc"></span></span></div>
+      <div class="scroll"><table><thead id="xr-head"></thead><tbody id="xr-body"></tbody></table></div>
+      <div class="controls"><button id="xr-prev" type="button">← Précédent</button><span class="hint" id="xr-page"></span><button id="xr-next" type="button">Suivant →</button></div>
+    </div>
+  </section>
+
+  <!-- ===== Traçabilité ===== -->
+  <section id="v9" class="view hidden">
+    <h2>Mesures et traçabilité</h2>
+    <p class="status">D'où viennent les lignes, ce qui a été retiré et pourquoi. Le détail des formules est dans la fiche de paramétrage (dépôt GitHub, dossier livrables).</p>
+    <div class="panel scroll"><table><tbody id="journal"></tbody></table></div>
+  </section>
+</main>
+<footer><p class="status">Projet BI, Dashboards &amp; Data Storytelling · M2 PSB · Ingryd Lo Tierzo Silva et Sara Lhasseni. Données : échantillon des marchés publics européens 2009-2017 (fichiers FINAL de la séance 3). Code et calculs de référence : dépôt GitHub exobusinessintelligence.</p></footer>
+
+<script>
+"use strict";
+// ---------- formats ----------
+const fmtInt = n => n.toLocaleString("fr-FR");
+const fmtPct = (x, d = 1) => (x * 100).toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }) + " %";
+const fmtNum = (x, d) => x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmtEur = x => x >= 1e9 ? fmtNum(x / 1e9, 2) + " Md€" : x >= 1e6 ? fmtNum(x / 1e6, 1) + " M€" : fmtInt(Math.round(x)) + " €";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// ---------- libellés (nomenclatures, pas des chiffres) ----------
+const PAYS = { AT: "Autriche", BE: "Belgique", BG: "Bulgarie", CH: "Suisse", CY: "Chypre", CZ: "Tchéquie", DE: "Allemagne", DK: "Danemark", EE: "Estonie", ES: "Espagne", FI: "Finlande", FR: "France", GR: "Grèce", HR: "Croatie", HU: "Hongrie", IE: "Irlande", IS: "Islande", IT: "Italie", LI: "Liechtenstein", LT: "Lituanie", LU: "Luxembourg", LV: "Lettonie", MK: "Macédoine du Nord", MT: "Malte", NL: "Pays-Bas", NO: "Norvège", PL: "Pologne", PT: "Portugal", RO: "Roumanie", SE: "Suède", SI: "Slovénie", SK: "Slovaquie", UK: "Royaume-Uni" };
+const CPV = { "03": "Produits agricoles et de la pêche", "09": "Produits pétroliers, énergie", "14": "Produits miniers, métaux", "15": "Produits alimentaires", "16": "Machines agricoles", "18": "Vêtements, chaussures", "19": "Cuir, textiles, plastiques", "22": "Imprimés", "24": "Produits chimiques", "30": "Matériel de bureau et informatique", "31": "Machines électriques", "32": "Équipements de communication", "33": "Matériel médical et pharmaceutique", "34": "Équipements de transport", "35": "Sécurité et défense", "37": "Musique, sport, jeux", "38": "Laboratoire, optique, précision", "39": "Mobilier, entretien", "41": "Eau collectée et purifiée", "42": "Machines industrielles", "43": "Machines pour mines et BTP", "44": "Matériaux de construction", "45": "Travaux de construction", "48": "Logiciels", "50": "Réparation et entretien", "51": "Installation", "55": "Hôtellerie, restauration", "60": "Transport", "63": "Services annexes aux transports", "64": "Postes et télécommunications", "65": "Services publics (eau, énergie)", "66": "Finance et assurance", "70": "Immobilier", "71": "Architecture, ingénierie", "72": "Services informatiques", "73": "Recherche et développement", "75": "Administration, défense", "76": "Services pétroliers et gaziers", "77": "Agriculture, sylviculture", "79": "Services aux entreprises", "80": "Enseignement, formation", "85": "Santé et action sociale", "90": "Assainissement, environnement", "92": "Loisirs, culture, sport", "98": "Autres services" };
+const CONTRAT = { W: "Travaux", U: "Fournitures", S: "Services" };
+const PROC = { OPE: "Ouverte", RES: "Restreinte", NIC: "Négociée avec mise en concurrence", AWP: "Attribution sans publication préalable", NOC: "NOC (code non confirmé)" };
+// Procédures signalées et exclues du classement de l'axe A (pas de mise en concurrence publiée).
+const NO_COMPET = new Set(["NOC", "AWP"]);
+
+// ---------- données ----------
+let P, R, M, DIV;
+const S = { aShow: "all", xFile: "P", xRow: null, xq: "", xrProc: "", xrPage: 0, rel: "R1", rStrat: null, rScope: "OPE", tab: "v1", axe: "A", aCross: "PS", aSeuil: 0.40, aCap: 20, aSort: ["rank", "jeu"], bCross: "P", cCross: "PS", cCap: 500, x: null, xSort: "z", xPage: 0, prev: [] };
+
+function median(arr) {
+  if (!arr.length) return null;
+  const a = Float64Array.from(arr).sort(), m = a.length >> 1;
+  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+}
+const codeOf = (d, dim, v) => v === "" ? null : d.dicts[dim].indexOf(v);
+function filt() { return { pays: $("f-pays").value, annee: $("f-annee").value, contrat: $("f-contrat").value, sect: $("f-sect").value }; }
+
+// Filtre commun sur le fichier principal ; ignoreYear pour la fenêtre PME verrouillée.
+function select(d, f, ignoreYear, div) {
+  const c = d.cols, out = [];
+  const p = codeOf(d, "pays", f.pays), k = codeOf(d, "contrat", f.contrat), y = f.annee === "" ? null : +f.annee;
+  const s = div && f.sect !== "" ? +f.sect : null;
+  for (let i = 0; i < d.n; i++) {
+    if (p !== null && c.pays[i] !== p) continue;
+    if (k !== null && c.contrat[i] !== k) continue;
+    if (!ignoreYear && y !== null && c.year[i] !== y) continue;
+    if (s !== null && div[i] !== s) continue;
+    out.push(i);
+  }
+  return out;
+}
+const lab = {
+  P: i => PAYS[P.dicts.pays[P.cols.pays[i]]] || P.dicts.pays[P.cols.pays[i]] || "non renseigné",
+  S: i => DIV[i] < 0 ? "secteur inconnu" : String(DIV[i]).padStart(2, "0") + " · " + (CPV[String(DIV[i]).padStart(2, "0")] || "division CPV"),
+  R: i => { const k = P.dicts.proc[P.cols.proc[i]]; return k ? PROC[k] || k : "procédure non renseignée"; },
+  C: i => CONTRAT[P.dicts.contrat[P.cols.contrat[i]]] || "?"
+};
+const keyOf = { P: i => P.cols.pays[i], S: i => DIV[i], R: i => P.cols.proc[i], C: i => P.cols.contrat[i] };
+function segKey(cross, i) { return cross.split("").map(d => keyOf[d](i)).join("|"); }
+function segLabel(cross, i) { return cross.split("").map(d => lab[d](i)).join(" × "); }
+function segFilter(cross, i) { const o = {}; cross.split("").forEach(d => o[d] = keyOf[d](i)); return o; }
+
+// ---------- Vue 1 · six KPI ----------
+function card(o) {
+  const badge = !o.ok ? "" : o.alert ? `<span class="tag act">${o.alert}</span>` : o.calm ? `<span class="tag info">${o.calm}</span>` : "";
+  return `<div class="card"><div class="axe">${o.axe} · ${o.type}</div><div class="t">${o.titre}</div>
+    <div class="big${o.ok ? "" : " low"}">${o.ok ? o.valeur : (o.lowText || "effectif insuffisant")}</div>
+    <div class="n">${o.effectif}</div><div style="margin-top:6px">${badge}</div>${o.extra || ""}
+    <div class="rule">${o.regle}</div>${o.link ? `<div style="margin-top:6px"><button class="link" type="button" data-go="${o.link[0]}" data-axe="${o.link[1] || ""}">${o.link[2]}</button></div>` : ""}${o.link2 ? `<div style="margin-top:4px"><button class="link" type="button" data-drill="${o.link2[0]}">${o.link2[1]}</button></div>` : ""}</div>`;
+}
+function kpi4Card(f, cost) {
+  const K = M.kpi4, base = { extra: cost, axe: "Axe B · PME", type: "indicateur avancé (levier)", titre: "4 · Écart ajusté du 6-10 lots sur la part de PME", link: ["v2", "R3", "Pourquoi ? relation R3 →"],
+    regle: `Estimé une fois par pays (2016-2017, PME renseignée, 6-10 lots contre non allotis ; logistique contrôlée par montant, contrat, année). Publié seulement si ≥ ${K.seuil_par_groupe} marchés dans chaque groupe. Association ajustée, hétérogène : pas un effet causal.` };
+  const ptsTxt = e => `${e.ecart_pts > 0 ? "+" : ""}${fmtNum(e.ecart_pts, 1)} pts`;
+  const ci = e => `[${fmtNum(e.ecart_lo, 1)} ; ${fmtNum(e.ecart_hi, 1)}]`;
+  if (f.contrat || f.sect) return card(Object.assign(base, { ok: false, lowText: "non estimé pour ce sous-ensemble", effectif: "Le modèle n'a pas été estimé par contrat ni par secteur : afficher un chiffre ici serait une précision fausse." }));
+  if (f.pays) {
+    const e = K.pays[f.pays] || { n_6_10: 0, n_non_alloti: 0 };
+    const eff = `${fmtInt(e.n_6_10)} marchés à 6-10 lots · ${fmtInt(e.n_non_alloti)} non allotis`;
+    if (e.or === undefined) return card(Object.assign(base, { ok: false, lowText: "non estimable", effectif: eff + ` (seuil : ${K.seuil_par_groupe} dans chaque groupe)` }));
+    const est = e.ecart_lo > 0 || e.ecart_hi < 0;
+    return card(Object.assign(base, { ok: true, valeur: ptsTxt(e) + `<div class="n">IC 95 % ${ci(e)}</div>`, effectif: eff + ` · rapport de cotes ${fmtNum(e.or, 2)} [${fmtNum(e.or_lo, 2)} ; ${fmtNum(e.or_hi, 2)}]`,
+      alert: null, calm: est ? "association établie (IC hors 0)" : "non établi : l'intervalle contient 0" }));
+  }
+  const rows = Object.entries(K.pays).filter(([, e]) => e.or !== undefined).sort((a, b) => b[1].ecart_pts - a[1].ecart_pts);
+  const x = v => Math.max(0, Math.min(100, (v + 30) / 50 * 100));
+  const forest = rows.concat([["moy", K.ensemble_effet_moyen]]).map(([k, e]) => {
+    const est = e.ecart_lo > 0 || e.ecart_hi < 0;
+    return `<div style="display:grid;grid-template-columns:96px 1fr;gap:6px;align-items:center;font-size:12px;margin-top:4px"><span>${k === "moy" ? "Effet moyen*" : esc(PAYS[k] || k)}</span>
+      <span title="${ptsTxt(e)} ${ci(e)}" style="position:relative;height:16px;display:block"><i style="position:absolute;left:${x(0)}%;top:0;bottom:0;width:1px;background:var(--muted)"></i>
+      <i style="position:absolute;top:7px;height:2px;left:${x(e.ecart_lo)}%;width:${x(e.ecart_hi) - x(e.ecart_lo)}%;background:var(--accent)"></i>
+      <i style="position:absolute;top:3px;width:10px;height:10px;margin-left:-5px;border-radius:50%;left:${x(e.ecart_pts)}%;${est ? "background:var(--accent)" : "background:var(--card);border:2px solid var(--accent);box-sizing:border-box"}"></i></span></div>`;
+  }).join("");
+  const fr = K.pays.FR;
+  return card(Object.assign(base, { ok: true, valeur: `France ${ptsTxt(fr)}<div class="n">IC 95 % ${ci(fr)}</div>`,
+    effectif: `${rows.length} pays estimables sur ${Object.keys(K.pays).length}. Point plein : intervalle hors 0 ; point creux : non établi. Échelle de −30 à +20 points.${forest}<div class="hint">* tous pays, effet pays contrôlé : ${ptsTxt(K.ensemble_effet_moyen)} ${ci(K.ensemble_effet_moyen)}, ${fmtInt(K.ensemble_effet_moyen.n_6_10)} et ${fmtInt(K.ensemble_effet_moyen.n_non_alloti)} marchés.</div>`,
+    calm: "seul pays où l'association est établie : la France" }));
+}
+function renderV1(f) {
+  const c = P.cols, ope = codeOf(P, "proc", "OPE"), yes = codeOf(P, "pme", "Y");
+  let n1 = 0, d1 = 0, offs = [], vals = [], sumW = 0, nz = 0, z3 = 0, wz3 = 0;
+  const rows = select(P, f, false, DIV);
+  for (const i of rows) {
+    const o = c.offers[i];
+    if (c.proc[i] === ope && o !== null && o >= 1) { d1++; if (o === 1) n1++; offs.push(o); }
+    const v = c.value[i]; if (v !== null) { vals.push(v); sumW += v * c.poids[i]; }
+    if (c.z[i] !== null) { nz++; if (c.z[i] > 3) { z3++; wz3 += v * c.poids[i]; } }
+  }
+  let n3 = 0, d3 = 0, w3 = 0;
+  for (const i of select(P, f, true, DIV)) { const y = c.year[i]; if (y !== 2016 && y !== 2017) continue; w3++; if (c.pme[i] >= 0) { d3++; if (c.pme[i] === yes) n3++; } }
+  // Prix à payer du 6-10 lots (R2) : offre unique, procédure ouverte, 6-10 lots contre non allotis, filtres appliqués.
+  let ca = 0, cn = 0, cc = 0, cm = 0;
+  for (const i of rows) { const o = c.offers[i], l = c.lots[i]; if (c.proc[i] !== ope || o === null || o < 1 || l === null) continue;
+    if (l >= 6 && l <= 10) { cn++; if (o === 1) ca++; } else if (l === 0) { cm++; if (o === 1) cc++; } }
+  const costHtml = cn >= 100 && cm >= 100 ? `<div class="n" style="margin-top:6px;border-left:3px solid var(--warn);padding-left:8px"><b>Prix à payer (R2)</b> : offre unique ${fmtPct(ca / cn)} en 6-10 lots (${fmtInt(ca)} / ${fmtInt(cn)}) contre ${fmtPct(cc / cm)} non allotis (${fmtInt(cc)} / ${fmtInt(cm)}), soit ${(ca / cn - cc / cm) >= 0 ? "+" : ""}${fmtNum((ca / cn - cc / cm) * 100, 1)} points. Procédure ouverte, filtres appliqués.</div>`
+    : `<div class="n" style="margin-top:6px">Prix à payer (R2) : effectif insuffisant (${fmtInt(cn)} et ${fmtInt(cm)} marchés, seuil 100).</div>`;
+  // Queue : part du montant pondéré portée par le 1 % des plus gros montants du périmètre.
+  const sorted = Float64Array.from(vals).sort(); const p99 = sorted.length ? sorted[Math.floor(0.99 * (sorted.length - 1))] : Infinity;
+  let wTop = 0; for (const i of rows) { const v = c.value[i]; if (v !== null && v > p99) wTop += v * c.poids[i]; }
+  const med = median(offs), t1 = d1 ? n1 / d1 : 0, t3 = d3 ? n3 / d3 : 0;
+  $("v1-perim").innerHTML = `Périmètre : fichier principal (${fmtInt(rows.length)} attributions). KPI 1 et 2 : procédure ouverte. <b>KPI 3 et 4 : fenêtre 2016-2017 verrouillée</b> (la variable PME n'existe pas avant 2016)${f.annee ? ", le filtre Année ne s'y applique pas" : ""}. Les procédures rares sont lues à part (onglet Mesures).`;
+  $("kpis").innerHTML = [
+    card({ axe: "Axe A · Concurrence", type: "indicateur de résultat", titre: "1 · Taux d'offre unique, procédure ouverte", ok: d1 >= 100, valeur: fmtPct(t1), effectif: `${fmtInt(n1)} / ${fmtInt(d1)} marchés avec au moins une offre`,
+      alert: d1 >= 100 && t1 > 0.40 ? "au-dessus de 40 %" : null, calm: d1 >= 100 && t1 <= 0.40 ? "sous le seuil de 40 %" : null, regle: "Seuil d'affichage : 100 marchés. Sentinelles 940 et 999 exclues. NOC exclue par précaution (code non confirmé).", link: ["v3", "A", "Où agir ? segments par montant en jeu →"], link2: ["ou", "Voir les marchés à offre unique (vue 4) →"] }),
+    card({ axe: "Axe A · Concurrence", type: "agrégat non additif", titre: "2 · Médiane du nombre d'offres, procédure ouverte", ok: d1 >= 100, valeur: med === null ? "" : fmtNum(med, Number.isInteger(med) ? 0 : 1) + " offres", effectif: `N = ${fmtInt(d1)} marchés`,
+      alert: d1 >= 100 && med <= 2 ? "médiane ≤ 2 : surveillance" : null, calm: d1 >= 100 && med > 2 ? "au-dessus de 2 offres" : null, regle: "Associée à l'offre unique, sans la précéder : indicateur de surveillance, pas avancé. Recalculée sur les lignes.", link: ["v3", "A", "Liste de surveillance →"] }),
+    card({ axe: "Axe B · PME", type: "indicateur de résultat", titre: "3 · Part de PME parmi les attributions renseignées", ok: d3 >= 100, valeur: fmtPct(t3), effectif: `${fmtInt(n3)} / ${fmtInt(d3)} renseignés · renseignement ${w3 ? fmtPct(d3 / w3, 0) : "—"} (${fmtInt(d3)} / ${fmtInt(w3)})`,
+      alert: d3 >= 100 && t3 < 0.40 ? "sous 40 % : revue d'allotissement" : null, calm: d3 >= 100 && t3 >= 0.40 ? "au-dessus de 40 %" : null, regle: "Fenêtre 2016-2017. Seuil : 100 renseignés. Un renseignement faible fragilise la part.", link: ["v3", "B", "Où agir ? pays sous 40 % →"] }),
+    kpi4Card(f, costHtml),
+    card({ axe: "Axe C · Budget", type: "agrégat additif", titre: "5 · Montant total pondéré", ok: vals.length >= 30, valeur: fmtNum(sumW / 1e9, 1) + " Md€", effectif: `N = ${fmtInt(vals.length)} attributions · Σ montant × POIDS · médiane ${vals.length ? fmtEur(median(vals)) : "—"} par attribution`,
+      alert: sumW && wTop / sumW > 0.5 ? `${fmtPct(wTop / sumW, 0)} porté par 1 % des montants` : null, calm: sumW && wTop / sumW <= 0.5 ? `${fmtPct(wTop / sumW, 0)} porté par 1 % des montants` : null, regle: "Seuil : 30 attributions. L'échantillon reproduit mal la queue (poids ≈ 15) : vérifier le dernier centile avant tout audit.", link: ["v3", "C", "Qui pèse ? test du dernier centile →"] }),
+    card({ axe: "Axe C · Budget", type: "indicateur de ciblage", titre: "6 · Part du montant portée par les attributions atypiques (z > 3)", ok: nz >= 30, valeur: sumW ? fmtPct(wz3 / sumW) : "—", effectif: `${fmtInt(z3)} attributions atypiques sur ${fmtInt(nz)} scorées · ${fmtEur(wz3)} / ${fmtEur(sumW)}`,
+      calm: "atypique ne veut pas dire irrégulier", regle: "Indice : écart du montant à celui prédit par secteur × contrat, pays, année, lots, procédure. Seuil : 30 attributions.", link: ["v3", "C", "Où concentrer l'audit ? →"], link2: ["z3", "Voir les attributions atypiques (vue 4) →"] })
+  ].join("");
+  const ope1 = codeOf(P, "proc", "OPE");
+  $("kpis").querySelectorAll("button[data-drill]").forEach(b => b.onclick = () => drill(b.dataset.drill === "z3"
+    ? { seg: {}, label: "Vue 1 · attributions atypiques (z > 3)", pred: i => P.cols.z[i] > 3, sort: "z" }
+    : { seg: {}, label: "Vue 1 · marchés à offre unique, procédure ouverte", pred: i => P.cols.proc[i] === ope1 && P.cols.offers[i] === 1, sort: "value" }));
+  $("kpis").querySelectorAll("button[data-go]").forEach(b => b.onclick = () => { if (b.dataset.axe) { if (b.dataset.go === "v2") { S.rel = b.dataset.axe; S.rStrat = null; } else S.axe = b.dataset.axe; } S.prev.push(S.tab); go(b.dataset.go); });
+}
+
+// ---------- tri multiple ----------
+function sortRows(rows, keys) {
+  return rows.sort((a, b) => { for (const k of keys) { const x = a[k] ?? -Infinity, y = b[k] ?? -Infinity; if (x !== y) return y - x; } return 0; });
+}
+function head(cols, keys, onSort) {
+  return "<tr>" + cols.map(c => {
+    if (!c.k) return `<th class="${c.num ? "num" : ""}">${c.t}</th>`;
+    const i = keys.indexOf(c.k), mark = i === 0 ? " ↓" : i === 1 ? " ↓²" : "";
+    return `<th class="sort ${c.num ? "num" : ""}" data-sort="${c.k}" title="Trier (le tri précédent devient secondaire)">${c.t}${mark}</th>`;
+  }).join("") + "</tr>";
+}
+function bindSort(theadId, getKeys, setKeys) {
+  $(theadId).querySelectorAll("th.sort").forEach(th => th.onclick = () => {
+    const k = th.dataset.sort, cur = getKeys().filter(x => x !== k); setKeys([k, cur[0]]); render();
+  });
+}
+const chipRow = (id, opts, cur, set) => { $(id).innerHTML = opts.map(o => `<button type="button" class="chip" aria-pressed="${o[0] === cur}" data-v="${o[0]}">${o[1]}</button>`).join(""); $(id).querySelectorAll("button").forEach((b, j) => b.onclick = () => { set(opts[j][0]); render(); }); };
+
+// ---------- Vue 2 · relations stratifiées ----------
+const VCLS = [[0, 5e4, "< 50 k€"], [5e4, 2e5, "50-200 k€"], [2e5, 1e6, "200 k€-1 M€"], [1e6, 5e6, "1-5 M€"], [5e6, Infinity, "≥ 5 M€"]];
+const vcls = v => v === null ? -1 : VCLS.findIndex(c => v >= c[0] && v < c[1]);
+const STRAT = { P: ["Pays", i => P.cols.pays[i], k => PAYS[P.dicts.pays[k]] || P.dicts.pays[k]], C: ["Type de contrat", i => P.cols.contrat[i], k => CONTRAT[P.dicts.contrat[k]] || "?"],
+  R: ["Procédure", i => P.cols.proc[i], k => k < 0 ? "non renseignée" : P.dicts.proc[k]], V: ["Classe de valeur", i => vcls(P.cols.value[i]), k => k < 0 ? "montant inconnu" : VCLS[k][2]] };
+const REL = {
+  R1: { axe: "Axe A · Concurrence", name: "R1 · Enchère électronique et offre unique", type: "bin", e: "avec enchère", r: "sans enchère", out: "offre unique", strata: ["P", "C", "R"], def: "P", scope: true,
+    status: "<b>Associative</b> : on peut cibler et surveiller, pas recommander. Si l'association disparaît dans un pays, l'action « enchère » n'y a pas de fondement.",
+    g: i => { const k = P.dicts.enchere[P.cols.enchere[i]]; return k === "Y" ? 1 : k === "N" ? 0 : null; }, y: i => P.cols.offers[i] === 1 ? 1 : 0, need: i => P.cols.offers[i] !== null && P.cols.offers[i] >= 1 },
+  R2: { axe: "Axe A · Concurrence (prix à payer de l'axe B)", name: "R2 · 6-10 lots et offre unique", type: "bin", e: "6-10 lots", r: "non alloti", out: "offre unique", strata: ["C", "P", "R"], def: "C", scope: true,
+    status: "<b>Associative</b> : à surveiller en contre-indicateur. Découper en 6-10 lots va avec plus d'offres uniques : c'est le coût à mettre en regard de R3.",
+    g: i => { const l = P.cols.lots[i]; return l === null ? null : l === 0 ? 0 : l >= 6 && l <= 10 ? 1 : null; }, y: i => P.cols.offers[i] === 1 ? 1 : 0, need: i => P.cols.offers[i] !== null && P.cols.offers[i] >= 1 },
+  R3: { axe: "Axe B · PME", name: "R3 · 6-10 lots et part de PME (2016-2017)", type: "bin", e: "6-10 lots", r: "non alloti", out: "attribution à une PME", strata: ["P", "V", "C"], def: "P", years: true,
+    status: "<b>Association ajustée, hétérogène</b> : elle change de sens selon le pays. Recommandable seulement à titre de pilote, là où elle est établie (France), avec son coût en offre unique (R2) et une condition d'arrêt.",
+    g: i => { const l = P.cols.lots[i]; return l === null ? null : l === 0 ? 0 : l >= 6 && l <= 10 ? 1 : null; }, y: i => P.dicts.pme[P.cols.pme[i]] === "Y" ? 1 : 0, need: i => P.cols.pme[i] >= 0 && (P.cols.year[i] === 2016 || P.cols.year[i] === 2017) },
+  R4: { axe: "Axe C · Budget", name: "R4 · Critère multicritère et montant", type: "cont", e: "multicritère (M)", r: "prix seul (L)", out: "montant", strata: ["C", "P"], def: "C",
+    status: "<b>Associative, sens probablement inversé</b> : c'est l'enjeu du marché qui précède le choix du multicritère. À surveiller, pas à recommander.",
+    g: i => { const k = P.dicts.crit[P.cols.crit[i]]; return k === "M" ? 1 : k === "L" ? 0 : null; }, need: i => P.cols.value[i] !== null && P.cols.value[i] > 0 }
+};
+const Z = 1.959964;
+function orStats(a, b, c, d) {
+  const cc = a && b && c && d ? 0 : 0.5, A = a + cc, B = b + cc, C = c + cc, D = d + cc;
+  const or = A * D / (B * C), se = Math.sqrt(1 / A + 1 / B + 1 / C + 1 / D);
+  const n1 = a + b, n0 = c + d, p1 = a / n1, p0 = c / n0, sd = Math.sqrt(p1 * (1 - p1) / n1 + p0 * (1 - p0) / n0);
+  return { or, lo: or * Math.exp(-Z * se), hi: or * Math.exp(Z * se), p1, p0, diff: p1 - p0, dlo: p1 - p0 - Z * sd, dhi: p1 - p0 + Z * sd, a, n1, c, n0 };
+}
+function mantelHaenszel(cells) {            // rapport de cotes commun et IC de Robins-Breslow-Greenland
+  let R = 0, S = 0, PR = 0, PSQR = 0, QS = 0;
+  for (const [a, b, c, d] of cells) { const n = a + b + c + d; if (!n || !(a + b) || !(c + d)) continue;
+    const r = a * d / n, s_ = b * c / n, p = (a + d) / n, q = (b + c) / n; R += r; S += s_; PR += p * r; PSQR += p * s_ + q * r; QS += q * s_; }
+  if (!R || !S) return null;
+  const or = R / S, se = Math.sqrt(PR / (2 * R * R) + PSQR / (2 * R * S) + QS / (2 * S * S));
+  return { or, lo: or * Math.exp(-Z * se), hi: or * Math.exp(Z * se) };
+}
+function contStats(x1, x0, v1, v0) {        // x = log10 du montant ; d de Cohen et rapport des médianes
+  const m = a => a.reduce((t, x) => t + x, 0) / a.length, va = (a, mu) => a.reduce((t, x) => t + (x - mu) ** 2, 0) / (a.length - 1);
+  const n1 = x1.length, n0 = x0.length, m1 = m(x1), m0 = m(x0), sp = Math.sqrt(((n1 - 1) * va(x1, m1) + (n0 - 1) * va(x0, m0)) / (n1 + n0 - 2));
+  const d = (m1 - m0) / sp, se = Math.sqrt((n1 + n0) / (n1 * n0) + d * d / (2 * (n1 + n0)));
+  return { d, lo: d - Z * se, hi: d + Z * se, se, n1, n0, med1: median(v1), med0: median(v0) };
+}
+function renderV2(f) {
+  const c = P.cols, rel = REL[S.rel], strat = S.rStrat && rel.strata.includes(S.rStrat) || S.rStrat === "none" ? S.rStrat : rel.def;
+  chipRow("r-chips", Object.keys(REL).map(k => [k, REL[k].name.split(" · ")[0] + " · " + REL[k].axe.split(" · ")[1].split(" (")[0]]), S.rel, v => { S.rel = v; S.rStrat = null; });
+  $("r-axe").textContent = rel.axe; $("r-name").textContent = rel.name; $("r-status").innerHTML = rel.status;
+  $("r-scope-w").classList.toggle("hidden", !rel.scope);
+  if (rel.scope) chipRow("r-scope", [["OPE", "Procédure ouverte (comme le KPI 1)"], ["ALL", "Toutes procédures (note S3)"]], S.rScope, v => S.rScope = v);
+  chipRow("r-strat", rel.strata.map(k => [k, STRAT[k][0]]).concat([["none", "Aucune"]]), strat, v => S.rStrat = v);
+  const ope = codeOf(P, "proc", "OPE"), base = select(P, f, !!rel.years, DIV);
+  const rows = base.filter(i => rel.need(i) && (!rel.scope || S.rScope === "ALL" || c.proc[i] === ope));
+  const sk = strat === "none" ? null : STRAT[strat][1], groups = new Map();
+  const G = { 1: [], 0: [] };
+  for (const i of rows) { const g = rel.g(i); if (g === null) continue; G[g].push(i);
+    if (sk) { const k = sk(i); let s = groups.get(k); if (!s) groups.set(k, s = { k, 1: [], 0: [] }); s[g].push(i); } }
+  const yrs = rel.years ? "2016-2017 (filtre Année ignoré)" : (f.annee || "2009-2017");
+  $("r-pop").textContent = `Population : ${rel.type === "bin" ? "attributions avec résultat renseigné" : "attributions avec montant"}${rel.scope ? (S.rScope === "ALL" ? ", toutes procédures du fichier principal (NOC comprise, comme dans la note de la séance 3)" : ", procédure ouverte") : ""}, ${yrs}. Une strate est publiée si chacun des deux groupes compte au moins 30 attributions (règle de la séance 3).`;
+  const sel = (g, k) => ({ label: `${rel.name.split(" · ")[0]} · ${g ? rel.e : rel.r}${k !== undefined ? " · " + STRAT[strat][2](k) : ""}`, seg: {}, years: rel.years ? [2016, 2017] : null,
+    pred: i => rel.need(i) && rel.g(i) === g && (!rel.scope || S.rScope === "ALL" || c.proc[i] === ope) && (k === undefined || sk(i) === k), sort: rel.type === "cont" ? "value" : "offers" });
+  let brut, adj = null, strataRows = [], hidden = 0;
+  if (rel.type === "bin") {
+    const cnt = ids => { let e = 0; for (const i of ids) e += rel.y(i); return e; };
+    const a = cnt(G[1]), cc = cnt(G[0]);
+    brut = G[1].length && G[0].length ? orStats(a, G[1].length - a, cc, G[0].length - cc) : null;
+    $("r-groups").innerHTML = [[1, a, G[1].length], [0, cc, G[0].length]].map(([g, e, n]) => `<div class="kpi click" data-g="${g}" style="cursor:pointer"><b>${n ? fmtPct(e / n) : "—"}</b><span>${g ? rel.e : rel.r} : ${fmtInt(e)} / ${fmtInt(n)} (${rel.out}) · voir les lignes →</span></div>`).join("");
+    const cells = [];
+    for (const s of groups.values()) { const a1 = cnt(s[1]), c0 = cnt(s[0]); cells.push([a1, s[1].length - a1, c0, s[0].length - c0]);
+      if (s[1].length >= 30 && s[0].length >= 30) strataRows.push(Object.assign(orStats(a1, s[1].length - a1, c0, s[0].length - c0), { k: s.k })); else hidden++; }
+    if (sk) adj = mantelHaenszel(cells);
+  } else {
+    const lv = ids => ids.map(i => Math.log10(c.value[i])), vv = ids => ids.map(i => c.value[i]);
+    brut = G[1].length > 1 && G[0].length > 1 ? contStats(lv(G[1]), lv(G[0]), vv(G[1]), vv(G[0])) : null;
+    $("r-groups").innerHTML = [[1, G[1]], [0, G[0]]].map(([g, ids]) => `<div class="kpi click" data-g="${g}" style="cursor:pointer"><b>${ids.length ? fmtEur(median(vv(ids))) : "—"}</b><span>montant médian, ${g ? rel.e : rel.r} : ${fmtInt(ids.length)} attributions · voir les lignes →</span></div>`).join("");
+    let wsum = 0, wd = 0;
+    for (const s of groups.values()) { if (s[1].length >= 30 && s[0].length >= 30) { const st = contStats(lv(s[1]), lv(s[0]), vv(s[1]), vv(s[0])); strataRows.push(Object.assign(st, { k: s.k })); wsum += 1 / st.se ** 2; wd += st.d / st.se ** 2; } else hidden++; }
+    if (sk && wsum) { const d = wd / wsum, se = Math.sqrt(1 / wsum); adj = { d, lo: d - Z * se, hi: d + Z * se }; }
+  }
+  $("r-groups").querySelectorAll(".kpi.click").forEach(el => el.onclick = () => { S.prev.push(S.tab); S.x = sel(+el.dataset.g); S.xSort = S.x.sort; S.xPage = 0; go("v4"); });
+  strataRows.sort((x, y) => (y.n1 + y.n0) - (x.n1 + x.n0));
+  // Lecture : jamais « X entraîne Y ».
+  const bin = rel.type === "bin", ref = bin ? 1 : 0, val = r => bin ? r.or : r.d;
+  const fmtE = r => r ? (bin ? `rapport de cotes ${fmtNum(r.or, 2)} [${fmtNum(r.lo, 2)} ; ${fmtNum(r.hi, 2)}]` : `d = ${fmtNum(r.d, 2)} [${fmtNum(r.lo, 2)} ; ${fmtNum(r.hi, 2)}]`) : "non calculable";
+  const sig = r => r.lo > ref || r.hi < ref;
+  const dir = brut ? Math.sign(val(brut) - ref) : 1, up = strataRows.filter(r => sig(r) && Math.sign(val(r) - ref) === dir).length, dn = strataRows.filter(r => sig(r) && Math.sign(val(r) - ref) === -dir).length;
+  $("r-read").innerHTML = !brut ? "Effectif insuffisant pour comparer les deux groupes." :
+    `<b>Brut :</b> ${fmtE(brut)}${bin ? `, écart ${brut.diff >= 0 ? "+" : ""}${fmtNum(brut.diff * 100, 1)} points [${fmtNum(brut.dlo * 100, 1)} ; ${fmtNum(brut.dhi * 100, 1)}]` : `, rapport des médianes × ${fmtNum(brut.med1 / brut.med0, 1)}`}.` +
+    (sk ? ` <b>Ajusté sur ${STRAT[strat][0].toLowerCase()}</b> (${bin ? "Mantel-Haenszel" : "moyenne des strates pondérée"}) : ${fmtE(adj)}. Sur ${strataRows.length} strate(s) publiable(s) : ${up} dans le même sens que l'association brute et ${dn} en sens inverse (intervalle excluant ${ref}), les autres non établies.` +
+      (brut && adj && (sig(brut) && !sig(adj) || (val(brut) - ref) * (val(adj) - ref) < 0) ? " <b>L'association brute ne résiste pas à l'ajustement.</b>" : dn && up ? " <b>Association hétérogène : elle change de sens selon la strate (paradoxe de Simpson possible).</b>" : "") : "");
+  const lo = bin ? 0.2 : -1.2, hi = bin ? 5 : 1.6, x = v => bin ? Math.max(0, Math.min(100, (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo)) * 100)) : Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+  const forest = (r, strong) => `<div style="position:relative;height:16px;min-width:160px"><i style="position:absolute;left:${x(ref)}%;top:0;bottom:0;width:1px;background:var(--muted)"></i><i style="position:absolute;top:7px;height:2px;left:${x(r.lo)}%;width:${Math.max(1, x(r.hi) - x(r.lo))}%;background:${strong ? "var(--ink)" : "var(--accent)"}"></i><i style="position:absolute;top:3px;width:10px;height:10px;margin-left:-5px;border-radius:50%;left:${x(val(r))}%;${sig(r) ? `background:${strong ? "var(--ink)" : "var(--accent)"}` : "background:var(--card);border:2px solid var(--accent);box-sizing:border-box"}"></i></div>`;
+  $("r-head").innerHTML = `<tr><th>Ligne</th><th class="num">${rel.e}</th><th class="num">${rel.r}</th><th class="num">${bin ? "Rapport de cotes [IC 95 %]" : "d de Cohen [IC 95 %]"}</th><th>${bin ? "échelle log, 0,2 à 5 ; trait = 1" : "−1,2 à 1,6 ; trait = 0"}</th></tr>`;
+  const cellTxt = (r, g) => bin ? `${fmtPct(g ? r.p1 : r.p0)} <span class="hint">(${fmtInt(g ? r.a : r.c)} / ${fmtInt(g ? r.n1 : r.n0)})</span>` : `${fmtEur(g ? r.med1 : r.med0)} <span class="hint">(${fmtInt(g ? r.n1 : r.n0)})</span>`;
+  const rowsHtml = [];
+  if (brut) rowsHtml.push(`<tr><td><b>Brut</b></td><td class="num">${cellTxt(brut, 1)}</td><td class="num">${cellTxt(brut, 0)}</td><td class="num">${fmtE(brut).replace(/^.*?(\d|−|-)/, "$1")}</td><td>${forest(brut, true)}</td></tr>`);
+  if (adj) rowsHtml.push(`<tr><td><b>Ajusté sur ${STRAT[strat][0].toLowerCase()}</b></td><td class="num" colspan="2"><span class="hint">${bin ? "Mantel-Haenszel, toutes strates" : "strates publiables"}</span></td><td class="num">${fmtE(adj).replace(/^.*?(\d|−|-)/, "$1")}</td><td>${forest(adj, true)}</td></tr>`);
+  strataRows.forEach((r, j) => rowsHtml.push(`<tr class="click" data-j="${j}"><td>${esc(STRAT[strat][2](r.k))}</td><td class="num">${cellTxt(r, 1)}</td><td class="num">${cellTxt(r, 0)}</td><td class="num">${bin ? `${fmtNum(r.or, 2)} [${fmtNum(r.lo, 2)} ; ${fmtNum(r.hi, 2)}]` : `${fmtNum(r.d, 2)} [${fmtNum(r.lo, 2)} ; ${fmtNum(r.hi, 2)}]`}</td><td>${forest(r)}</td></tr>`));
+  $("r-body").innerHTML = rowsHtml.join("");
+  $("r-body").querySelectorAll("tr.click").forEach(tr => tr.onclick = () => { const r = strataRows[+tr.dataset.j]; S.prev.push(S.tab); S.x = sel(1, r.k); S.xSort = S.x.sort; S.xPage = 0; go("v4"); });
+  $("r-foot").textContent = (sk ? `${hidden} strate(s) non publiée(s) : moins de 30 attributions dans l'un des deux groupes (elles restent dans l'ajustement de Mantel-Haenszel). ` : "") + "Point plein : l'intervalle exclut l'absence d'association ; point creux : non établi. Cliquer une strate descend aux attributions du premier groupe (vue 4).";
+}
+
+// ---------- Vue 3 · Axe A ----------
+function renderA(f) {
+  const c = P.cols, cross = S.aCross, withProc = cross.includes("R");
+  const ope = codeOf(P, "proc", "OPE");
+  const segs = new Map(); let jeuTotal = 0, excl = { n: 0, ou: 0 };
+  for (const i of select(P, f, false, DIV)) {
+    const o = c.offers[i]; if (o === null || o < 1) continue;
+    const pk = P.dicts.proc[c.proc[i]];
+    if (!withProc && c.proc[i] !== ope) continue;           // KPI 1 : procédure ouverte
+    if (pk === undefined) continue;
+    const k = segKey(cross, i);
+    let s = segs.get(k); if (!s) segs.set(k, s = { k, label: segLabel(cross, i), filter: segFilter(cross, i), den: 0, num: 0, jeu: 0, offs: [], nocomp: NO_COMPET.has(pk) });
+    s.den++; s.offs.push(o);
+    const w = c.value[i] === null ? 0 : c.value[i] * c.poids[i];
+    if (o === 1) { s.num++; s.jeu += w; if (!s.nocomp) jeuTotal += w; }
+  }
+  let rows = [...segs.values()].map(s => Object.assign(s, { taux: s.num / s.den, med: median(s.offs), ok: s.den >= 100 }));
+  rows.forEach(s => { s.offs = null; });
+  const elig = rows.filter(s => s.ok && !s.nocomp);
+  const alert = sortRows(elig.filter(s => s.taux > S.aSeuil), ["jeu", "taux"]);
+  const chosen = new Set(alert.slice(0, S.aCap).map(s => s.k));
+  const jeuChosen = alert.slice(0, S.aCap).reduce((t, s) => t + s.jeu, 0);
+  const jeuAlert = alert.reduce((t, s) => t + s.jeu, 0);
+  rows.forEach(s => {
+    s.status = s.nocomp ? "nocomp" : !s.ok ? "low" : chosen.has(s.k) ? "act" : s.taux > S.aSeuil ? "alert" : s.med <= 2 ? "watch" : "";
+    s.rank = s.status === "act" ? 4 : s.status === "alert" ? 3 : s.status === "watch" ? 2 : s.status === "" ? 1 : 0;
+  });
+  // Les segments sous le seuil et sans concurrence ne remontent jamais en tête.
+  const main = sortRows(rows.filter(s => s.ok && !s.nocomp && (S.aShow === "all" || s.status === S.aShow)), S.aSort);
+  const tail = rows.filter(s => !s.ok || s.nocomp).sort((a, b) => (b.nocomp - a.nocomp) || b.den - a.den);
+  const watch = rows.filter(s => s.status === "watch").length;
+  $("a-kpis").innerHTML = [
+    [fmtInt(alert.length), `segments en alerte (> ${fmtPct(S.aSeuil, 0)}, N ≥ 100)`],
+    [fmtInt(Math.min(S.aCap, alert.length)), `dossiers retenus (capacité N = ${S.aCap})`],
+    [fmtEur(jeuChosen), `montant en jeu couvert · ${jeuAlert ? fmtPct(jeuChosen / jeuAlert) : "—"} des segments en alerte`],
+    [jeuTotal ? fmtPct(jeuChosen / jeuTotal) : "—", `de toute la dépense à offre unique du périmètre (${fmtEur(jeuTotal)})`],
+    [fmtInt(watch), "segments en liste de surveillance (sous le seuil, médiane ≤ 2 offres)"]
+  ].map(k => `<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+  $("a-note").textContent = (withProc ? "Toutes procédures du fichier principal ; NOC et AWP signalées et exclues du classement (pas de mise en concurrence publiée)." : "Procédure ouverte seulement (définition du KPI 1).") + " Montant en jeu = Σ montant × POIDS des attributions à offre unique du segment : la dépense à replacer en concurrence.";
+  const cols = [{ t: "Segment" }, { t: "Statut", k: "rank" }, { t: "Montant en jeu", k: "jeu", num: 1 }, { t: "Offre unique", k: "taux", num: 1 }, { t: "Num. / dén.", k: "den", num: 1 }, { t: "Médiane des offres", k: "med", num: 1 }];
+  $("a-head").innerHTML = head(cols, S.aSort);
+  bindSort("a-head", () => S.aSort, k => S.aSort = k);
+  const maxJeu = Math.max(1, ...main.map(s => s.jeu));
+  const tag = s => ({ act: '<span class="tag act">Instruire</span>', alert: '<span class="tag watch">Alerte hors capacité</span>', watch: '<span class="tag info">Surveillance</span>', low: '<span class="tag">Effectif insuffisant</span>', nocomp: '<span class="tag">Sans concurrence publiée</span>' }[s.status] || "");
+  const tr = (s, i) => `<tr class="click ${s.ok && !s.nocomp ? "" : "low"}" data-i="${i}"><td>${esc(s.label)}</td><td>${tag(s)}</td><td class="num">${fmtEur(s.jeu)}${s.ok && !s.nocomp ? `<div class="bar"><i style="width:${s.jeu / maxJeu * 100}%"></i></div>` : ""}</td><td class="num">${s.ok ? fmtPct(s.taux) : "—"}</td><td class="num">${fmtInt(s.num)} / ${fmtInt(s.den)}</td><td class="num">${s.ok ? fmtNum(s.med, Number.isInteger(s.med) ? 0 : 1) : "—"}</td></tr>`;
+  const lim = S.aShow === "all" ? 40 : Infinity, tl = S.aShow === "all" ? tail : [];
+  const shown = main.slice(0, lim), all = shown.concat(tl.slice(0, 15));
+  $("a-body").innerHTML = (shown.map(tr).join("") || `<tr><td colspan="6" class="hint">Aucun segment avec ce statut.</td></tr>`) + (tl.length ? `<tr><td colspan="6" class="hint">Segments hors classement : ${fmtInt(tail.filter(s => !s.ok).length)} sous le seuil de 100 marchés, ${fmtInt(tail.filter(s => s.nocomp && s.ok).length)} sans concurrence publiée. Les 15 plus gros :</td></tr>` + tail.slice(0, 15).map((s, j) => tr(s, shown.length + j)).join("") : "");
+  $("a-body").querySelectorAll("tr.click").forEach(row => row.onclick = () => { const s = all[+row.dataset.i]; drill({ axe: "A", seg: s.filter, label: "Axe A · " + s.label, onlyOpe: !withProc }); });
+  $("a-foot").textContent = `${fmtInt(main.length)} segments ${S.aShow === "all" ? "classés (40 premiers affichés)" : "avec ce statut, tous affichés"}. Tri : ${S.aSort.map(k => ({ rank: "statut (instruire, alerte, surveillance)", jeu: "montant en jeu", taux: "taux", den: "effectif", med: "médiane" }[k])).join(" puis ")}. Seuils : 100 marchés par segment ; alerte au-dessus du seuil choisi.`;
+}
+
+// ---------- Vue 3 · Axe B ----------
+function renderB(f) {
+  const c = P.cols, cross = S.bCross, yes = codeOf(P, "pme", "Y");
+  const segs = new Map(); let tot = { w: 0, ren: 0, pme: 0 };
+  for (const i of select(P, f, true, DIV)) {
+    const y = c.year[i]; if (y !== 2016 && y !== 2017) continue;
+    const k = segKey(cross, i);
+    let s = segs.get(k); if (!s) segs.set(k, s = { k, label: segLabel(cross, i), filter: segFilter(cross, i), w: 0, ren: 0, pme: 0, lk: 0, na: 0, enjeu: 0 });
+    s.w++; tot.w++;
+    if (c.pme[i] >= 0) { s.ren++; tot.ren++; if (c.pme[i] === yes) { s.pme++; tot.pme++; } }
+    const l = c.lots[i];
+    if (l !== null) { s.lk++; if (l === 0) { s.na++; if (c.value[i] !== null) s.enjeu += c.value[i] * c.poids[i]; } }
+  }
+  const rows = [...segs.values()].map(s => Object.assign(s, { part: s.ren ? s.pme / s.ren : null, rens: s.ren / s.w, pna: s.lk ? s.na / s.lk : null, ok: s.ren >= 100 }));
+  rows.forEach(s => { s.status = !s.ok ? "low" : s.part < 0.40 ? "act" : ""; s.prio = s.status === "act" ? 1 : 0; });
+  const main = rows.filter(s => s.ok).sort((a, b) => (b.prio - a.prio) || (b.enjeu - a.enjeu));
+  const low = rows.filter(s => !s.ok).sort((a, b) => b.ren - a.ren);
+  const act = main.filter(s => s.status === "act");
+  $("b-kpis").innerHTML = [
+    [tot.ren ? fmtPct(tot.pme / tot.ren) : "—", `part de PME du périmètre (${fmtInt(tot.pme)} / ${fmtInt(tot.ren)} renseignés)`],
+    [tot.w ? fmtPct(tot.ren / tot.w) : "—", `taux de renseignement de la variable PME (${fmtInt(tot.ren)} / ${fmtInt(tot.w)})`],
+    [fmtInt(act.length), "segments sous 40 % de PME (≥ 100 renseignés) : revue d'allotissement"],
+    [fmtEur(act.reduce((t, s) => t + s.enjeu, 0)), "montant non alloti de ces segments (enjeu)"]
+  ].map(k => `<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+  $("b-head").innerHTML = "<tr><th>Segment</th><th>Statut</th><th class='num'>Part de PME</th><th class='num'>PME / renseignés</th><th class='num'>Taux de renseignement</th><th class='num'>Part non allotie</th><th class='num'>Enjeu : montant non alloti</th></tr>";
+  const tr = (s, i) => `<tr class="click ${s.ok ? "" : "low"}" data-i="${i}"><td>${esc(s.label)}</td><td>${s.status === "act" ? '<span class="tag act">Revue d\'allotissement</span>' : s.status === "low" ? '<span class="tag">Effectif insuffisant</span>' : ""}${s.ok && s.rens < 0.5 ? ' <span class="tag watch">Renseignement &lt; 50 %</span>' : ""}</td><td class="num">${s.ok ? fmtPct(s.part) : "—"}</td><td class="num">${fmtInt(s.pme)} / ${fmtInt(s.ren)}</td><td class="num">${fmtPct(s.rens, 0)} <span class="hint">(${fmtInt(s.ren)} / ${fmtInt(s.w)})</span></td><td class="num">${s.pna === null ? "—" : fmtPct(s.pna, 0) + ` <span class="hint">(${fmtInt(s.na)} / ${fmtInt(s.lk)})</span>`}</td><td class="num">${fmtEur(s.enjeu)}</td></tr>`;
+  const shown = main.slice(0, 40), all = shown.concat(low.slice(0, 10));
+  $("b-body").innerHTML = shown.map(tr).join("") + (low.length ? `<tr><td colspan="7" class="hint">${fmtInt(low.length)} segments sous 100 marchés renseignés, non classés. Les 10 plus gros :</td></tr>` + low.slice(0, 10).map((s, j) => tr(s, shown.length + j)).join("") : "");
+  $("b-body").querySelectorAll("tr.click").forEach(row => row.onclick = () => { const s = all[+row.dataset.i]; drill({ axe: "B", seg: s.filter, label: "Axe B · " + s.label + " · 2016-2017", years: [2016, 2017] }); });
+  $("b-foot").textContent = "Classement : segments sous 40 % de PME d'abord, puis par montant non alloti décroissant (ce qui pourrait être découpé en lots). Lots inconnus exclus de la part non allotie. Un taux de renseignement faible rend la part de PME fragile : à vérifier avant d'ouvrir une revue.";
+}
+
+// ---------- Vue 3 · Axe C ----------
+function renderC(f) {
+  const c = P.cols, cross = S.cCross;
+  const rows = select(P, f, false, DIV).filter(i => c.z[i] !== null);
+  const n = rows.length, cap = S.cCap === "5" ? Math.round(n * 0.05) : Math.min(+S.cCap, n);
+  const w = i => c.value[i] * c.poids[i];
+  const byZ = rows.slice().sort((a, b) => c.z[b] - c.z[a]);
+  const list = byZ.slice(0, cap);
+  const wTot = rows.reduce((t, i) => t + w(i), 0), wList = list.reduce((t, i) => t + w(i), 0);
+  const nZ3 = rows.filter(i => c.z[i] > 3).length, inList3 = list.filter(i => c.z[i] > 3).length;
+  // Dernier centile des montants du périmètre (test demandé avant de pondérer l'audit par pays).
+  const vals = rows.map(i => c.value[i]).sort((a, b) => a - b);
+  const p99 = vals.length ? vals[Math.floor(0.99 * (vals.length - 1))] : Infinity;
+  const wTot99 = rows.reduce((t, i) => t + (c.value[i] <= p99 ? w(i) : 0), 0);
+  $("c-kpis").innerHTML = [
+    [fmtInt(cap), `attributions dans la liste d'audit (${fmtPct(n ? cap / n : 0)} des ${fmtInt(n)} scorées)`],
+    [wTot ? fmtPct(wList / wTot) : "—", `du montant pondéré couvert (${fmtEur(wList)} / ${fmtEur(wTot)})`],
+    [fmtInt(nZ3), `attributions à z > 3 dans le périmètre, dont ${fmtInt(inList3)} dans la liste`],
+    [list.length ? fmtNum(c.z[list[list.length - 1]], 1) : "—", "z de la dernière attribution retenue (seuil effectif de la liste)"]
+  ].map(k => `<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+  // Composition par pays : part de la liste contre part des attributions et du montant (avec et sans dernier centile).
+  const byP = new Map();
+  const add = (i, key, v) => { const p = c.pays[i]; let s = byP.get(p); if (!s) byP.set(p, s = { p, l: 0, n: 0, w: 0, w99: 0 }); s[key] += v; };
+  rows.forEach(i => { add(i, "n", 1); add(i, "w", w(i)); if (c.value[i] <= p99) add(i, "w99", w(i)); });
+  list.forEach(i => add(i, "l", 1));
+  const comp = [...byP.values()].filter(s => s.l > 0).sort((a, b) => b.l - a.l).slice(0, 8);
+  $("c2-head").innerHTML = "<tr><th>Pays</th><th class='num'>Part de la liste d'audit</th><th class='num'>Part des attributions</th><th class='num'>Part du montant pondéré</th><th class='num'>… sans le dernier centile</th></tr>";
+  $("c2-body").innerHTML = comp.map(s => `<tr class="click" data-p="${s.p}"><td>${esc(PAYS[P.dicts.pays[s.p]] || P.dicts.pays[s.p])}</td><td class="num"><b>${fmtPct(s.l / cap)}</b> <span class="hint">(${fmtInt(s.l)} / ${fmtInt(cap)})</span></td><td class="num">${fmtPct(s.n / n)} <span class="hint">(${fmtInt(s.n)})</span></td><td class="num">${fmtPct(s.w / wTot)}</td><td class="num">${fmtPct(s.w99 / wTot99)}</td></tr>`).join("");
+  $("c2-body").querySelectorAll("tr.click").forEach(r => r.onclick = () => drill({ axe: "C", seg: { P: +r.dataset.p }, label: `Axe C · liste d'audit (N = ${fmtInt(cap)}) · ${PAYS[P.dicts.pays[+r.dataset.p]]}`, ids: new Set(list), sort: "z" }));
+  $("c2-foot").innerHTML = `Une seule liste d'audit : les N attributions au z le plus élevé du périmètre. Un pays surreprésenté dans la liste par rapport à sa part des attributions pose la question d'une pondération par pays. Le dernier centile (montants au-dessus de ${fmtEur(p99)}) est retiré dans la dernière colonne : si la part d'un pays s'effondre, elle tient à quelques très gros marchés. <button class="link" id="c-all" type="button">Voir toute la liste d'audit →</button>`;
+  $("c-all").onclick = () => drill({ axe: "C", seg: {}, label: `Axe C · liste d'audit complète (N = ${fmtInt(cap)})`, ids: new Set(list), sort: "z" });
+  // Segments.
+  const segs = new Map();
+  for (const i of rows) {
+    const k = segKey(cross, i);
+    let s = segs.get(k); if (!s) segs.set(k, s = { k, label: segLabel(cross, i), filter: segFilter(cross, i), n: 0, w: 0, a: 0, wa: 0 });
+    s.n++; s.w += w(i); if (c.z[i] > 3) { s.a++; s.wa += w(i); }
+  }
+  const all = [...segs.values()].map(s => Object.assign(s, { ok: s.n >= 30, pa: s.a / s.n }));
+  const main = all.filter(s => s.ok && s.a > 0).sort((a, b) => b.wa - a.wa);
+  const nLow = all.filter(s => !s.ok).length;
+  $("c-head").innerHTML = "<tr><th>Segment</th><th class='num'>Montant atypique (z &gt; 3)</th><th class='num'>Attributions atypiques</th><th class='num'>Part atypique</th><th class='num'>Montant pondéré du segment</th></tr>";
+  const maxW = Math.max(1, ...main.map(s => s.wa));
+  const shown = main.slice(0, 30);
+  $("c-body").innerHTML = shown.map((s, i) => `<tr class="click" data-i="${i}"><td>${esc(s.label)}</td><td class="num">${fmtEur(s.wa)}<div class="bar"><i style="width:${s.wa / maxW * 100}%;background:var(--warn)"></i></div></td><td class="num">${fmtInt(s.a)} / ${fmtInt(s.n)}</td><td class="num">${fmtPct(s.pa)}</td><td class="num">${fmtEur(s.w)}</td></tr>`).join("") || `<tr><td colspan="5" class="hint">Aucun segment d'au moins 30 attributions ne contient d'attribution à z &gt; 3.</td></tr>`;
+  $("c-body").querySelectorAll("tr.click").forEach(r => r.onclick = () => { const s = shown[+r.dataset.i]; drill({ axe: "C", seg: s.filter, label: "Axe C · " + s.label, sort: "z" }); });
+  $("c-foot").textContent = `${fmtInt(main.length)} segments d'au moins 30 attributions contiennent des attributions atypiques (30 premiers affichés) ; ${fmtInt(nLow)} segments sous 30 attributions ne sont pas classés. Montants pondérés (montant × POIDS).`;
+}
+
+// ---------- Vue 4 · exploration ----------
+function drill(sel) { S.prev.push(S.tab); S.x = sel; S.xSort = sel.sort || "value"; S.xPage = 0; S.xFile = "P"; S.xRow = null; go("v4"); }
+const fmtRatio = r => fmtNum(r, r >= 100 ? 0 : 1);
+const yn = (d, v) => v < 0 ? "non renseigné" : d.dicts.pme[v] === "Y" ? "Oui" : "Non";
+const ynd = (d, dim, v) => v < 0 ? "non renseigné" : ({ Y: "Oui", N: "Non" }[d.dicts[dim][v]] || d.dicts[dim][v]);
+function fiche(i) {
+  const c = P.cols, w = (c.value[i] ?? 0) * c.poids[i];
+  // Strate de comparaison : même pays, même division CPV, même type de contrat (recalculée sur les lignes).
+  const peers = []; for (let j = 0; j < P.n; j++) if (c.pays[j] === c.pays[i] && DIV[j] === DIV[i] && c.contrat[j] === c.contrat[i] && c.value[j] !== null) peers.push(c.value[j]);
+  const med = median(peers), rank = peers.filter(v => v < c.value[i]).length / Math.max(1, peers.length);
+  const z = c.z[i], crit = P.dicts.crit[c.crit[i]], ach = P.dicts.acheteur[c.acheteur[i]];
+  const verdict = z === null ? "" : z > 3 ? `<span class="tag act">Atypique (z > 3)</span> à vérifier : gros lot légitime, regroupement, ou erreur de saisie ?` : z > 2 ? `<span class="tag watch">Élevé (z entre 2 et 3)</span>` : `<span class="tag info">Dans la norme de ses caractéristiques</span>`;
+  const L = [["ID_AW", c.id[i]], ["Année", c.year[i]], ["Pays", PAYS[P.dicts.pays[c.pays[i]]] || P.dicts.pays[c.pays[i]]], ["CPV", (c.cpv[i] || "—") + (DIV[i] >= 0 ? " · " + lab.S(i) : "")],
+    ["Type de contrat", lab.C(i)], ["Procédure", lab.R(i)], ["Type d'acheteur (code)", ach ?? "non renseigné"], ["Nombre d'offres", c.offers[i] ?? "non renseigné (ou sentinelle 940 / 999)"],
+    ["Nombre de lots", c.lots[i] === null ? "inconnu" : c.lots[i] === 0 ? "0 (non alloti)" : c.lots[i]], ["Attributions du même avis", c.awards[i]], ["Attributaire PME", yn(P, c.pme[i]) + (c.year[i] < 2016 ? " (variable absente avant 2016)" : "")],
+    ["Enchère électronique", ynd(P, "enchere", c.enchere[i])], ["Critère", crit === "L" ? "prix seul (L)" : crit === "M" ? "multicritère (M)" : "non renseigné"]];
+  $("x-fiche").innerHTML = `<div class="axe">Fiche de l'attribution</div><h3 style="margin:2px 0 8px">ID_AW ${c.id[i]} · ${esc(lab.P(i))} · ${c.year[i]}</h3>
+    <div class="kpis">
+      <div class="kpi"><b>${c.value[i] === null ? "—" : fmtEur(c.value[i])}</b><span>montant attribué · pondéré ${fmtEur(w)} (POIDS ${fmtNum(c.poids[i], 2)})</span></div>
+      <div class="kpi"><b>${c.pred[i] === null ? "—" : fmtEur(c.pred[i])}</b><span>montant attendu au regard de ses caractéristiques (modèle d'anomalie)</span></div>
+      <div class="kpi"><b>${z === null ? "—" : fmtNum(z, 2)}</b><span>indice d'anomalie z ${c.pred[i] ? `· montant ${c.value[i] >= c.pred[i] ? "× " + fmtRatio(c.value[i] / c.pred[i]) : "÷ " + fmtRatio(c.pred[i] / c.value[i])} par rapport à l'attendu` : ""}</span></div>
+      <div class="kpi"><b>${med === null ? "—" : fmtEur(med)}</b><span>montant médian de sa strate (même pays × secteur × contrat, N = ${fmtInt(peers.length)}) · plus élevé que ${fmtPct(rank, 0)} de la strate</span></div>
+    </div>
+    <p>${verdict}</p>
+    <div class="scroll"><table><tbody>${L.map(r => `<tr><th style="width:240px">${r[0]}</th><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table></div>
+    <div class="controls"><button type="button" id="x-close">Fermer la fiche</button><span class="hint">Décision : retenir le dossier pour l'audit, ou l'écarter en notant la raison (gros lot légitime, erreur de saisie).</span></div>`;
+  $("x-fiche").classList.remove("hidden"); $("x-close").onclick = () => { S.xRow = null; render(); };
+}
+function renderX(f) {
+  chipRow("x-file", [["P", "Fichier principal"], ["R", "Procédures rares"]], S.xFile, v => { S.xFile = v; S.xRow = null; });
+  $("x-main").classList.toggle("hidden", S.xFile !== "P"); $("x-rares").classList.toggle("hidden", S.xFile !== "R");
+  $("x-back").classList.toggle("hidden", !S.prev.length);
+  if (S.xFile === "R") { $("x-fiche").classList.add("hidden"); return renderRares(f); }
+  const c = P.cols, sel = S.x || { seg: {}, label: "toutes les attributions des filtres de contexte" };
+  const ope = codeOf(P, "proc", "OPE"), q = S.xq;
+  let rows = select(P, f, !!sel.years, DIV).filter(i => {
+    for (const d in sel.seg) if (keyOf[d](i) !== sel.seg[d]) return false;
+    if (sel.years && !sel.years.includes(c.year[i])) return false;
+    if (sel.onlyOpe && (c.proc[i] !== ope || c.offers[i] === null || c.offers[i] < 1)) return false;
+    if (sel.ids && !sel.ids.has(i)) return false;
+    if (sel.pred && !sel.pred(i)) return false;
+    if (q && !(String(c.id[i]) === q || (c.cpv[i] || "").startsWith(q))) return false;
+    return true;
+  });
+  const key = { z: i => c.z[i] ?? -Infinity, value: i => c.value[i] ?? -Infinity, offers: i => -(c.offers[i] ?? Infinity), year: i => c.year[i] }[S.xSort];
+  rows.sort((a, b) => key(b) - key(a));
+  const per = 25, pages = Math.max(1, Math.ceil(rows.length / per)); S.xPage = Math.min(S.xPage, pages - 1);
+  $("x-sel").innerHTML = `Sélection : <b>${esc(sel.label)}</b>${q ? ` · recherche « ${esc(q)} »` : ""} · ${fmtInt(rows.length)} attribution${rows.length > 1 ? "s" : ""}`;
+  $("x-clear").classList.toggle("hidden", !S.x && !q);
+  const ou = rows.filter(i => c.offers[i] === 1).length, wo = rows.filter(i => c.offers[i] !== null && c.offers[i] >= 1).length, z3 = rows.filter(i => c.z[i] > 3).length;
+  $("x-stats").textContent = `Offre unique : ${fmtInt(ou)} / ${fmtInt(wo)} attributions avec au moins une offre · atypiques (z > 3) : ${fmtInt(z3)} · montant pondéré ${fmtEur(rows.reduce((t, i) => t + (c.value[i] ?? 0) * c.poids[i], 0))}. Cliquer une ligne ouvre sa fiche.`;
+  chipRow("x-sort", [["z", "Indice d'anomalie"], ["value", "Montant"], ["offers", "Moins d'offres"], ["year", "Année"]], S.xSort, v => { S.xSort = v; S.xPage = 0; });
+  $("x-head").innerHTML = "<tr><th>ID_AW</th><th>Année</th><th>Pays</th><th>CPV</th><th>Procédure</th><th>Contrat</th><th class='num'>Offres</th><th class='num'>Lots</th><th>PME</th><th class='num'>Montant</th><th class='num'>Attendu</th><th class='num'>z</th></tr>";
+  const page = rows.slice(S.xPage * per, S.xPage * per + per);
+  $("x-body").innerHTML = page.map((i, j) => `<tr class="click" data-j="${j}"${S.xRow === i ? ' style="outline:2px solid var(--accent)"' : ""}><td>${c.id[i]}</td><td>${c.year[i]}</td><td>${esc(P.dicts.pays[c.pays[i]] || "")}</td><td>${c.cpv[i] || "—"}</td><td>${esc(P.dicts.proc[c.proc[i]] || "—")}</td><td>${esc(CONTRAT[P.dicts.contrat[c.contrat[i]]] || "")}</td><td class="num">${c.offers[i] ?? "—"}</td><td class="num">${c.lots[i] ?? "—"}</td><td>${yn(P, c.pme[i])}</td><td class="num">${c.value[i] === null ? "—" : fmtEur(c.value[i])}</td><td class="num">${c.pred[i] === null ? "—" : fmtEur(c.pred[i])}</td><td class="num">${c.z[i] === null ? "—" : fmtNum(c.z[i], 1)}</td></tr>`).join("") || `<tr><td colspan="12" class="hint">Aucune attribution pour cette sélection${q ? " et cette recherche" : ""}. Élargir les filtres ou effacer la sélection.</td></tr>`;
+  $("x-body").querySelectorAll("tr.click").forEach(tr => tr.onclick = () => { S.xRow = page[+tr.dataset.j]; render(); $("x-fiche").scrollIntoView({ behavior: "smooth", block: "start" }); });
+  $("x-page").textContent = rows.length ? `${fmtInt(S.xPage * per + 1)}–${fmtInt(Math.min(rows.length, S.xPage * per + per))} sur ${fmtInt(rows.length)}` : "";
+  $("x-prev").disabled = S.xPage === 0; $("x-next").disabled = S.xPage >= pages - 1;
+  if (S.xRow !== null && S.xRow !== undefined) fiche(S.xRow); else $("x-fiche").classList.add("hidden");
+}
+
+// ---------- procédures rares (vue 4, fichier séparé) ----------
+function renderRares(f) {
+  const rc = R.cols, by = {}, rows = select(R, f, false, null);
+  for (const i of rows) {
+    const k = R.dicts.proc[rc.proc[i]] || "non renseignée";
+    const b = by[k] || (by[k] = { n: 0, ou: 0, den: 0, offs: [] });
+    b.n++; const o = rc.offers[i]; if (o !== null && o >= 1) { b.den++; b.offs.push(o); if (o === 1) b.ou++; }
+  }
+  $("rares").innerHTML = Object.keys(by).sort().map(k => { const b = by[k]; return `<tr><td><span class="tag">${k}</span></td><td class="num">${fmtInt(b.n)}</td><td class="num">${b.den >= 100 ? fmtPct(b.ou / b.den) : "effectif insuffisant"}</td><td class="num">${fmtInt(b.ou)} / ${fmtInt(b.den)}</td><td class="num">${b.offs.length ? fmtNum(median(b.offs), 0) : "—"}</td></tr>`; }).join("") + `<tr><td colspan="5" class="hint">Pas de ligne « total » : additionner des procédures surreprésentées par construction fausserait tout taux.</td></tr>`;
+  chipRow("xr-proc", [["", "Toutes"]].concat(R.dicts.proc.map(p => [p, p])), S.xrProc, v => { S.xrProc = v; S.xrPage = 0; });
+  const pc = S.xrProc === "" ? null : R.dicts.proc.indexOf(S.xrProc);
+  const list = rows.filter(i => pc === null || rc.proc[i] === pc).sort((a, b) => (rc.value[b] ?? -1) - (rc.value[a] ?? -1));
+  const per = 25, pages = Math.max(1, Math.ceil(list.length / per)); S.xrPage = Math.min(S.xrPage, pages - 1);
+  $("xr-head").innerHTML = "<tr><th>ID_AW</th><th>Année</th><th>Pays</th><th>CPV</th><th>Procédure</th><th>Contrat</th><th class='num'>Offres</th><th class='num'>Lots</th><th>PME</th><th class='num'>Montant</th></tr>";
+  $("xr-body").innerHTML = list.slice(S.xrPage * per, S.xrPage * per + per).map(i => `<tr><td>${rc.id[i]}</td><td>${rc.year[i]}</td><td>${esc(R.dicts.pays[rc.pays[i]] || "")}</td><td>${rc.cpv[i] || "—"}</td><td>${esc(R.dicts.proc[rc.proc[i]] || "—")}</td><td>${esc(CONTRAT[R.dicts.contrat[rc.contrat[i]]] || "")}</td><td class="num">${rc.offers[i] ?? "—"}</td><td class="num">${rc.lots[i] ?? "—"}</td><td>${yn(R, rc.pme[i])}</td><td class="num">${rc.value[i] === null ? "—" : fmtEur(rc.value[i])}</td></tr>`).join("") || `<tr><td colspan="10" class="hint">Aucune attribution.</td></tr>`;
+  $("xr-page").textContent = list.length ? `${fmtInt(S.xrPage * per + 1)}–${fmtInt(Math.min(list.length, S.xrPage * per + per))} sur ${fmtInt(list.length)} (triées par montant)` : "";
+  $("xr-prev").disabled = S.xrPage === 0; $("xr-next").disabled = S.xrPage >= pages - 1;
+}
+function journal() {
+  const jp = P.journal, jr = R.journal, a = jp.indice_anomalie;
+  const L = [["Fichier principal brut", fmtInt(jp.lignes_brutes)], ["Doublons stricts retirés en séance 3 (principal)", fmtInt(jp.doublons_stricts_s3)], ["Fichier principal FINAL", fmtInt(jp.lignes_final)],
+    ["ID_AW 164662498 présent 3 fois : lignes retirées (une attribution = une ligne)", fmtInt(jp.id_triple_retire)], ["Sentinelle 940 déjà mise à vide en séance 3", fmtInt(jp.sentinelle_940_deja_isolee)],
+    ["Valeur 999 mise à vide comme 940 (BG 2014, même acheteur)", fmtInt(jp.sentinelle_999_mise_a_vide)], ["Lignes utilisées par l'application (principal)", fmtInt(jp.lignes_application)],
+    ["Procédures rares brut → FINAL (2 doublons stricts)", fmtInt(jr.lignes_brutes) + " → " + fmtInt(jr.lignes_final)], ["Total des doublons stricts de la séance 3", "336 = 334 (principal) + 2 (rares)"],
+    ["Indice d'anomalie : R² du modèle (log10 du montant)", fmtNum(a.modele_r2, 3) + " sur " + fmtInt(a.n_modele) + " attributions"],
+    ["Attributions à z > 3 : nouvel indice / ancienne strate CPV × contrat", fmtInt(a.z_sup3_nouveau) + " (" + fmtPct(a.part_montant_z_sup3_nouveau) + " du montant) / " + fmtInt(a.z_sup3_ancien_cpv_contrat) + " (" + fmtPct(a.part_montant_z_sup3_ancien) + ")"]];
+  $("journal").innerHTML = L.map(r => `<tr><td>${r[0]}</td><td class="num">${r[1]}</td></tr>`).join("");
+}
+
+// ---------- navigation ----------
+const TABS = [["v1", "1 · Globale", "Où en sommes-nous ?"], ["v2", "2 · Analyse", "Pourquoi ?"], ["v3", "3 · Segmentation", "Où agir ?"], ["v4", "4 · Exploration", "Quel cas précis ?"], ["v9", "Mesures", "Traçabilité"]];
+function go(tab) { S.tab = tab; try { history.replaceState(null, "", "#" + tab); } catch (e) {} render(); window.scrollTo(0, 0); }
+function render() {
+  if (!P) return;
+  const t0 = performance.now(), f = filt();
+  $("tabs").innerHTML = TABS.map(t => `<button role="tab" aria-selected="${S.tab === t[0]}" data-t="${t[0]}">${t[1]}<small>${t[2]}</small></button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => { if (b.dataset.t !== S.tab) S.prev.push(S.tab); go(b.dataset.t); });
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("hidden", v.id !== S.tab));
+  if (S.tab === "v1") renderV1(f);
+  if (S.tab === "v2") renderV2(f);
+  if (S.tab === "v3") {
+    chipRow("axe-chips", [["A", "A · Concurrence"], ["B", "B · PME"], ["C", "C · Budget"]], S.axe, v => S.axe = v);
+    ["A", "B", "C"].forEach(a => $("ax-" + a).classList.toggle("hidden", a !== S.axe));
+    if (S.axe === "A") { chipRow("a-cross", [["PS", "Pays × secteur"], ["PR", "Pays × procédure"], ["SR", "Secteur × procédure"]], S.aCross, v => S.aCross = v); chipRow("a-seuil", [[0.30, "30 %"], [0.40, "40 %"], [0.50, "50 %"]], S.aSeuil, v => S.aSeuil = v); chipRow("a-show", [["all", "Tous"], ["act", "Instruire"], ["alert", "Alerte hors capacité"], ["watch", "Surveillance"]], S.aShow, v => S.aShow = v); renderA(f); }
+    if (S.axe === "B") { chipRow("b-cross", [["P", "Pays"], ["PS", "Pays × secteur"], ["PC", "Pays × contrat"]], S.bCross, v => S.bCross = v); renderB(f); }
+    if (S.axe === "C") { chipRow("c-cross", [["PS", "Pays × secteur"], ["PC", "Pays × contrat"], ["SR", "Secteur × procédure"]], S.cCross, v => S.cCross = v); chipRow("c-cap", [["100", "100"], ["500", "500"], ["1000", "1 000"], ["5", "5 % du périmètre"]], S.cCap, v => S.cCap = v); renderC(f); }
+  }
+  if (S.tab === "v4") renderX(f);
+  const act = [f.pays && "Pays = " + (PAYS[f.pays] || f.pays), f.annee && "Année = " + f.annee, f.contrat && "Contrat = " + CONTRAT[f.contrat], f.sect && "Secteur = " + f.sect.padStart(2, "0")].filter(Boolean);
+  $("perim").textContent = `Périmètre : fichier principal, 2009-2017${act.length ? " · " + act.join(" · ") : " · aucun filtre"}. Recalcul en ${Math.round(performance.now() - t0)} ms.`;
+}
+
+async function init() {
+  try {
+    const [p, r, m] = await Promise.all(["data/principal.json", "data/rares.json", "data/modeles.json"].map(u => fetch(u).then(x => { if (!x.ok) throw new Error(u + " " + x.status); return x.json(); })));
+    P = p; R = r; M = m;
+    DIV = Int16Array.from(P.cols.cpv, v => v ? +v.slice(0, 2) : -1);
+    P.dicts.pays.forEach(code => $("f-pays").insertAdjacentHTML("beforeend", `<option value="${code}">${esc(PAYS[code] || code)}</option>`));
+    for (let y = 2009; y <= 2017; y++) $("f-annee").insertAdjacentHTML("beforeend", `<option>${y}</option>`);
+    [...new Set(DIV)].filter(d => d >= 0).sort((a, b) => a - b).forEach(d => { const k = String(d).padStart(2, "0"); $("f-sect").insertAdjacentHTML("beforeend", `<option value="${d}">${k} · ${esc(CPV[k] || "division CPV")}</option>`); });
+    ["f-pays", "f-annee", "f-contrat", "f-sect"].forEach(id => $(id).addEventListener("change", () => { S.xPage = 0; render(); }));
+    $("reset").onclick = () => { ["f-pays", "f-annee", "f-contrat", "f-sect"].forEach(id => $(id).value = ""); render(); };
+    $("a-cap").oninput = e => { S.aCap = +e.target.value; $("a-cap-v").textContent = S.aCap; render(); };
+    $("x-prev").onclick = () => { S.xPage--; render(); }; $("x-next").onclick = () => { S.xPage++; render(); };
+    $("x-back").onclick = () => go(S.prev.pop() || "v3");
+    $("x-search").onsubmit = e => { e.preventDefault(); S.xq = $("x-q").value.trim().replace(/^cpv/i, ""); S.xPage = 0; S.xRow = null; S.xFile = "P"; render(); };
+    $("x-clear").onclick = () => { S.x = null; S.xq = ""; $("x-q").value = ""; S.xPage = 0; S.xRow = null; render(); };
+    $("xr-prev").onclick = () => { S.xrPage--; render(); }; $("xr-next").onclick = () => { S.xrPage++; render(); };
+    $("status").textContent = `Données chargées : ${fmtInt(P.n)} attributions (fichier principal) et ${fmtInt(R.n)} (procédures rares), deux sources distinctes jamais additionnées.`;
+    const h = (location.hash || "").slice(1); if (TABS.some(t => t[0] === h)) S.tab = h;
+    journal(); render();
+  } catch (e) { $("status").textContent = "Erreur de chargement des données : " + e.message; }
+}
+init();
+</script>
+</body>
+</html>
